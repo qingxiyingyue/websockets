@@ -21,12 +21,10 @@ from .messages import Assembler
 
 __all__ = ["Connection"]
 
-logger = logging.getLogger(__name__)
-
 
 class Connection:
     """
-    Threaded implementation of a WebSocket connection.
+    :mod:`threading` implementation of a WebSocket connection.
 
     :class:`Connection` provides APIs shared between WebSocket servers and
     clients.
@@ -229,7 +227,8 @@ class Connection:
 
         """
         try:
-            yield from self.recv_messages.get_iter()
+            for frame in self.recv_messages.get_iter():
+                yield frame
         except EOFError:
             raise self.protocol.close_exc from self.recv_events_exc
         except RuntimeError:
@@ -273,7 +272,7 @@ class Connection:
 
         Raises:
             ConnectionClosed: When the connection is closed.
-            RuntimeError: If a connection is busy sending a fragmented message.
+            RuntimeError: If the connection is sending a fragmented message.
             TypeError: If ``message`` doesn't have a supported type.
 
         """
@@ -552,7 +551,7 @@ class Connection:
 
                 # Acquire the connection lock.
                 with self.protocol_mutex:
-                    # Feed incoming data to the connection.
+                    # Feed incoming data to the protocol.
                     self.protocol.receive_data(data)
 
                     # This isn't expected to raise an exception.
@@ -595,7 +594,7 @@ class Connection:
             # Breaking out of the while True: ... loop means that we believe
             # that the socket doesn't work anymore.
             with self.protocol_mutex:
-                # Feed the end of the data stream to the connection.
+                # Feed the end of the data stream to the protocol.
                 self.protocol.receive_eof()
 
                 # This isn't expected to generate events.

@@ -624,8 +624,7 @@ class WebSocketCommonProtocol(asyncio.Protocol):
         error or a network failure.
 
         Args:
-            message (Union[Data, Iterable[Data], AsyncIterable[Data]): message
-                to send.
+            message: message to send.
 
         Raises:
             ConnectionClosed: When the connection is closed.

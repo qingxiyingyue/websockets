@@ -29,7 +29,7 @@ __all__ = ["serve", "unix_serve", "ServerConnection", "WebSocketServer"]
 
 class ServerConnection(Connection):
     """
-    Threaded implementation of a WebSocket server connection.
+    :mod:`threading` implementation of a WebSocket server connection.
 
     :class:`ServerConnection` provides :meth:`recv` and :meth:`send` methods for
     receiving and sending messages.
@@ -461,19 +461,18 @@ def serve(
                     assert protocol is connection.protocol
                     return select_subprotocol(connection, subprotocols)
 
-            # Initialize WebSocket connection
+            # Initialize WebSocket protocol
 
             protocol = ServerProtocol(
                 origins=origins,
                 extensions=extensions,
                 subprotocols=subprotocols,
                 select_subprotocol=protocol_select_subprotocol,
-                state=CONNECTING,
                 max_size=max_size,
                 logger=logger,
             )
 
-            # Initialize WebSocket protocol
+            # Initialize WebSocket connection
 
             assert create_connection is not None  # help mypy
             connection = create_connection(
